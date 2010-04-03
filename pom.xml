@@ -23,10 +23,17 @@
     <groupId>org.liveSense</groupId>
     <artifactId>com.google.gwt</artifactId>
     <packaging>bundle</packaging>
-    <version>2.0.1</version>
+    <version>2.0.3</version>
+
+    <properties>
+        <gwt.version>2.0.3</gwt.version>
+        <servlet.version>2.4</servlet.version>
+        <osgi.version>4.2.0</osgi.version>
+	</properties>
+
     <name>liveSense GWT packages</name>
     <description>
-        GWT packages
+        GWT packages and RPC-Servlet
     </description>
 
     <build>
@@ -35,7 +42,14 @@
                 <groupId>org.apache.sling</groupId>
                 <artifactId>maven-sling-plugin</artifactId>
             </plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -43,20 +57,16 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            com.google.gwt.*;version=${pom.version}
+                            com.google.gwt.*;version=${gwt.version},
+							org.liveSense.servlet.gwtrpc.*;version=${pom.version},
+							javax.servlet.*;version=${servlet.version},
+							org.osgi.*;version=${osgi.version}
                         </Export-Package>
-                        <Embed-Dependency>gwt-servlet</Embed-Dependency>
+                        <Embed-Dependency>
+							gwt-servlet,
+							gwt-user
+						</Embed-Dependency>
                         <Import-Package>
-                            !com.gargoylesoftware.*,
-                            !com.google.gwt.core.*,
-                            !com.google.gwt.dev.*,
-                            !com.google.gwt.util.*,
-                            !com.thoughtworks.*,
-                            !junit.framework.*,
-                            !org.apache.tapestry.*,
-                            !org.w3c.css.sac.*,
-                            !org.w3c.flute.*,
-                            !sun.misc.*,
                             *;resolution:=optional
                         </Import-Package>
 
@@ -66,64 +76,32 @@
         </plugins>
     </build>
     <dependencies>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+			<version>${gwt.version}</version>
+		</dependency>
+ 		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<version>${gwt.version}</version>
+		</dependency>
         <dependency>
-            <groupId>org.apache.jackrabbit</groupId>
-            <artifactId>jackrabbit-api</artifactId>
-            <version>1.6.0</version>
-            <optional>false</optional>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>${osgi.version}</version>
+			<scope>provided</scope>
+			<type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.jcr.api</artifactId>
-            <version>2.0.2-incubator</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.api</artifactId>
-            <version>2.0.8</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.jcr.base</artifactId>
-            <version>2.0.4-incubator</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.servlets.post</artifactId>
-            <version>2.0.4-incubator</version>
-            <optional>false</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr</artifactId>
-            <version>1.4.0</version>
-            <optional>false</optional>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.version}</version>
+			<scope>provided</scope>
+			<type>jar</type>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>${pom.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-servlet</artifactId>
-            <version>${pom.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>2.0.2</version>
-            <optional>false</optional>
-        </dependency>
-    </dependencies>
+	</dependencies>
 	<profiles>
 			<profile>
 			<id>git-push</id>
