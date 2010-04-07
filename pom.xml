@@ -28,7 +28,7 @@
     <properties>
         <gwt.version>2.0.3</gwt.version>
         <servlet.version>2.4</servlet.version>
-        <osgi.version>4.2.0</osgi.version>
+        <osgi.version>4.1.0</osgi.version>
 	</properties>
 
     <name>liveSense GWT packages</name>
