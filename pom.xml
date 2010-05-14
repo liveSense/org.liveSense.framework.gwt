@@ -100,8 +100,31 @@
 			<scope>provided</scope>
 			<type>jar</type>
         </dependency>
-
-	</dependencies>
+        <dependency>
+            <groupId>org.liveSense</groupId>
+            <artifactId>org.liveSense.utils</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+            <version>2.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.commons.auth</artifactId>
+            <version>0.9.0-SNAPSHOT</version>
+            <type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.9.RC1</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
 	<profiles>
 			<profile>
 			<id>git-push</id>
@@ -159,3 +182,6 @@
 		</profile>
 	</profiles>
 </project>
+
+
+
