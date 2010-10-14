@@ -43,8 +43,8 @@ import javax.jcr.SimpleCredentials;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
-import org.liveSense.utils.I18nResourceWrapper;
-import org.liveSense.utils.RequestWrapper;
+import org.liveSense.core.wrapper.I18nResourceWrapper;
+import org.liveSense.core.wrapper.RequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
