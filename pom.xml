@@ -21,12 +21,12 @@
     <modelVersion>4.0.0</modelVersion>
  
     <groupId>org.liveSense</groupId>
-    <artifactId>org.liveSense.servlet.gwt-rpc</artifactId>
+    <artifactId>org.liveSense.servlet.gwtrpc</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.0</version>
 
     <properties>
-        <gwt.version>2.0.4</gwt.version>
+        <gwt.version>2.1.0</gwt.version>
         <servlet.version>2.4</servlet.version>
         <osgi.version>4.1.0</osgi.version>
 	</properties>
@@ -58,16 +58,17 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.liveSense.servlet.gwtrpc.*;version=${version},
+                            org.liveSense.servlet.gwtrpc.*;version=${project.version},
                             com.google.gwt.rpc.server.*;version=${gwt.version},
                             com.google.gwt.user.server.rpc.*;version=${gwt.version},
                             com.google.gwt.user.client.rpc.*;version=${gwt.version}
                         </Export-Package>
-                        <Import-Package>!com.google.gwt.*,!javax.imageio.*,!junit.*,!org.w3c.*,!sun.misc,*</Import-Package>
+                        <Import-Package>!com.google.gwt.*,!javax.imageio.*,!junit.*,!org.w3c.*,!sun.misc,!javax.validation.*,!org.json.*,*</Import-Package>
                         <DynamicImport-Package>
                             javax.imageio.*
                         </DynamicImport-Package>
-                        <Embed-Dependency>gwt-servlet</Embed-Dependency>
+                        <Embed-Dependency>gwt-servlet
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
 
@@ -125,62 +126,6 @@
             <type>bundle</type>
         </dependency>
     </dependencies>
-	<profiles>
-			<profile>
-			<id>git-push</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<executable>git</executable>
-							<arguments>
-								<argument>push</argument>
-								<argument>origin</argument>
-								<argument>master</argument>
-							</arguments>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>git-pull</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<executable>git</executable>
-							<arguments>
-								<argument>pull</argument>
-								<argument>origin</argument>
-								<argument>master</argument>
-							</arguments>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
 
 
