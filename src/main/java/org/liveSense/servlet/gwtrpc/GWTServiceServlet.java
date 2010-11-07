@@ -89,6 +89,10 @@ import org.slf4j.LoggerFactory;
 public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2565545902953291699L;
+	/**
 	 * default log
 	 */
 	private final Logger log = LoggerFactory.getLogger(GWTServiceServlet.class);
