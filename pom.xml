@@ -19,17 +19,21 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+  <parent>
+      <groupId>org.liveSense</groupId>
+      <artifactId>org.liveSense.parent</artifactId>
+      <version>1-SNAPSHOT</version>
+  </parent>
+  <scm>
+      <connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
+      <developerConnection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</developerConnection>
+      <url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
+  </scm>
  
     <groupId>org.liveSense</groupId>
     <artifactId>org.liveSense.servlet.gwtrpc</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0</version>
-
-    <properties>
-        <gwt.version>2.1.0</gwt.version>
-        <servlet.version>2.4</servlet.version>
-        <osgi.version>4.1.0</osgi.version>
-	</properties>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>liveSense GWT-RPC servlet</name>
     <description>
@@ -38,19 +42,13 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.sling</groupId>
-                <artifactId>maven-sling-plugin</artifactId>
-            </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-            <plugin>
+   
+               <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-scr-plugin</artifactId>
+                </plugin>
+
+         <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -59,9 +57,7 @@
                     <instructions>
                         <Export-Package>
                             org.liveSense.servlet.gwtrpc.*;version=${project.version},
-                            com.google.gwt.rpc.server.*;version=${gwt.version},
-                            com.google.gwt.user.server.rpc.*;version=${gwt.version},
-                            com.google.gwt.user.client.rpc.*;version=${gwt.version}
+                            com.google.gwt.*;version=${gwt.version}
                         </Export-Package>
                         <Import-Package>!com.google.gwt.*,!javax.imageio.*,!junit.*,!org.w3c.*,!sun.misc,!javax.validation.*,!org.json.*,*</Import-Package>
                         <DynamicImport-Package>
@@ -76,54 +72,37 @@
         </plugins>
     </build>
     <dependencies>
-		<dependency>
-			<groupId>com.google.gwt</groupId>
-			<artifactId>gwt-servlet</artifactId>
-			<version>${gwt.version}</version>
-		</dependency>
+        <dependency>
+             <groupId>com.google.gwt</groupId>
+             <artifactId>gwt-servlet</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.version}</version>
-			<scope>provided</scope>
-			<type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
-			<scope>provided</scope>
-			<type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.liveSense</groupId>
             <artifactId>org.liveSense.core</artifactId>
-            <version>1.0.0</version>
-            <type>bundle</type>
         </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.commons.log</artifactId>
-            <version>2.0.6</version>
-            <type>bundle</type>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.auth.core</artifactId>
-            <version>1.0.2</version>
-            <type>bundle</type>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.engine</artifactId>
-            <version>2.1.0</version>
-            <type>bundle</type>
         </dependency>
     </dependencies>
 </project>

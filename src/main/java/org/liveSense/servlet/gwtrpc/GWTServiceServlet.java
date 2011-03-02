@@ -106,7 +106,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     /**
      * The <code>ClassLoader</code> to use when GWT reflects on RPC classes.
      */
-    private ClassLoader classLoader;
+    private ClassLoader classLoader = null;
 
     /**
      * Process a call originating from the given request. Uses the
@@ -172,7 +172,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
      */
     @Override
     protected SerializationPolicy doGetSerializationPolicy(HttpServletRequest request, String moduleBaseURL, String strongName) {
-
+    	
         // The request can tell you the path of the web app relative to the
         // container root.
         String contextPath = request.getContextPath();
