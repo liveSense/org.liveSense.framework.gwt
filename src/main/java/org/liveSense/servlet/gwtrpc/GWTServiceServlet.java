@@ -35,14 +35,20 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.jcr.LoginException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
+import org.liveSense.core.Configurator;
 import org.liveSense.core.wrapper.I18nResourceWrapper;
 import org.liveSense.core.wrapper.RequestWrapper;
 import org.slf4j.Logger;
@@ -102,7 +108,10 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     private Bundle bundle;
 
 	private String rootPath = "";
-
+	
+	@Reference
+	private Configurator config;
+	
     /**
      * The <code>ClassLoader</code> to use when GWT reflects on RPC classes.
      */
@@ -294,36 +303,46 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 		this.rootPath = rootPath;
 	}
 
-
-
 	protected RequestWrapper getRequest() {
 		return new RequestWrapper(this.getThreadLocalRequest(), null);
 	}
 
+	protected String getUser() {
+		return (String)this.getThreadLocalRequest().getAttribute("org.osgi.service.http.authentication.remote.user");
+	}
+	
+	protected Locale getLocale() {
+		if (getThreadLocalRequest().getAttribute("locale") == null) {
+			RequestWrapper rw = new RequestWrapper(getThreadLocalRequest(), config.getDefaultLocale());
+			getThreadLocalRequest().setAttribute("locale", rw.getLocale());
+			return rw.getLocale();
+		} else {
+			return (Locale)getThreadLocalRequest().getLocale();
+		}
+	}
+	
+	protected void setLocale(Locale locale) {
+		getThreadLocalRequest().setAttribute("locale", locale);		
+	}
+	
+	public String formatMessage(String key, Object[] args) {
+		String message = getResourceBundle().getString(key);
+		return MessageFormat.format(message, args);
+	}
+	
 	protected Session getUserSession(Repository repository) throws AccessDeniedException, InternalException {
-		String user = this.getThreadLocalRequest().getRemoteUser();
 		try {
 			AuthenticationInfo info = (AuthenticationInfo) this.getThreadLocalRequest().getAttribute("org.apache.sling.commons.auth.spi.AuthenticationInfo");
-                        return repository.login(new SimpleCredentials(info.getUser(), info.getPassword()));
+            return repository.login(new SimpleCredentials(getUser(), info.getPassword()));
 		} catch (LoginException ex) {
-			throw new AccessDeniedException(getMessages().get("accessDeniedForUser",new Object[]{user, ex}));
+			throw new AccessDeniedException(formatMessage("accessDeniedForUser",new Object[]{getUser(), ex}));
 		} catch (RepositoryException ex) {
-			throw new InternalException(getMessages().get("repositoryException", new Object[]{ex}));
+			throw new InternalException(formatMessage("repositoryException", new Object[]{ex}));
 		}
 	}
 
-	protected void setMessageBundleName(String messageBundleName) {
-		getRequest().getRequest().setAttribute("bundle_for_"+getClass().getName(), messageBundleName);
-	}
-
-	protected I18nResourceWrapper getMessages() {
-		String bundleName = (String)getRequest().getRequest().getAttribute("bundle_for_"+getClass().getName());
-		if (bundleName != null) return getRequest().getMessages("bundleName");
-		return getRequest().getMessages("messages");
-	}
-
 	public String getExceptionMessage(Throwable th) {
-		return getMessages().get("exception",new Object[]{th.getClass().getName(), th.getStackTrace()[0].getFileName(), th.getStackTrace()[0].getMethodName(), th.getStackTrace()[0].getLineNumber()});
+		return formatMessage("exception",new Object[]{th.getClass().getName(), th.getStackTrace()[0].getFileName(), th.getStackTrace()[0].getMethodName(), th.getStackTrace()[0].getLineNumber()});
 	}
 
 	protected Object throwRPCExceptionLocalized(String key) throws Exception  {
@@ -339,7 +358,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 	}
 
 	protected Object throwRPCExceptionLocalized(String key, Throwable th, Object[] args) throws Exception  {
-		String message = getMessages().get(key);
+		String message = getResourceBundle().getString(key);
 		return throwRPCException(message, th, args);
 	}
 	
@@ -357,20 +376,12 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
 	protected Object throwRPCException(String message, Throwable th, Object[] args) throws Exception  {
 		String result = message;
-		if (th != null) {
-			if (th instanceof InternalException) {
-				throw (InternalException)th;
-			} else if (th instanceof AccessDeniedException) {
-				throw (AccessDeniedException)th;
-			}
-		}
 
 		if (args != null) {
 
 			try {
 				StringBuffer sb = new StringBuffer();
-				MessageFormat messageForm = new MessageFormat(message, getRequest().getLocale());
-				messageForm.format(args, sb, null);
+				MessageFormat.format(message, args, sb, null);
 				result = sb.toString();
 			} catch (IllegalArgumentException e1) {
 				log.error("Error in format message", e1);
@@ -378,6 +389,24 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 		}
 		if (th != null) log.error(result, th);
 		else log.error(result);
-		throw new InternalException(result, th);
+
+		if (th != null) {
+			if (th instanceof InternalException) {
+				throw (InternalException)th;
+			} else if (th instanceof AccessDeniedException) {
+				throw (AccessDeniedException)th;
+			} else throw new InternalException(result, th);
+		}
+		throw new InternalException(result);
 	}
+
+	public ResourceBundle getResourceBundle() {
+		return (ResourceBundle)getThreadLocalRequest().getAttribute("resourceBundle");
+	}
+	
+	public void setResourceBundle(
+		ResourceBundle resourceBundle) {
+		getThreadLocalRequest().setAttribute("resourceBundle", resourceBundle);
+	
+	}		
 }
