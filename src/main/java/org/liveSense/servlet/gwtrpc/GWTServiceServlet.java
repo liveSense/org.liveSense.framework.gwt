@@ -155,6 +155,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
             result = super.processCall(payload);
             Thread.currentThread().setContextClassLoader(old);
         } else {
+        	callInit();
             result = super.processCall(payload);
         }
         return result;
