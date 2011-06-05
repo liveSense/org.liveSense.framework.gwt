@@ -26,6 +26,7 @@ import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.gwt.user.server.rpc.SerializationPolicyLoader;
 
 import org.osgi.framework.Bundle;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -44,8 +45,12 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
+import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.sling.auth.core.AuthenticationSupport;
+import org.apache.sling.auth.core.impl.SlingAuthenticator;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
+import org.apache.sling.jcr.api.SlingRepository;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
 import org.liveSense.core.Configurator;
@@ -56,7 +61,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Extending google's remote service servlet to enable resolving of resources through
- * a bundle (for policy file loading).
+ * a clientBundle (for policy file loading).
  * <p/>
  * This class is for version 2.0.3 of the GWT gwt-servlet.jar edition and it is highly recommended to compile
  * client apps with the corresponding 2.0.3 GWT compiler only!
@@ -64,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * GWT service servlets that are used in sling are required to extend the <code>SlingRemoteServiceServlet</code>
  * instead of google's own <code>RemoteServiceServlet</code>.
  * <p/>
- * It is important that any bundle using the Sling GWT Servlet Library imports the required packages from this bundle,
+ * It is important that any clientBundle using the Sling GWT Servlet Library imports the required packages from this clientBundle,
  * for otherwise RPC calls will fail due to well hidden <code>ClassNotFoundException</code>s. The client app will in
  * such a case only report "This application is outdated, please hit refresh...". As such, import the following
  * packages:
@@ -92,6 +97,8 @@ import org.slf4j.LoggerFactory;
  * com.google.gwt.xml.client.impl
  * </code>
  */
+
+@Component(componentAbstract=true)
 public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
 	/**
@@ -105,12 +112,21 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     /**
      * The <code>org.osgi.framework.Bundle</code> to load resources from.
      */
-    private Bundle bundle;
+    private Bundle clientBundle;
 
 	private String rootPath = "";
 	
 	@Reference
 	private Configurator config;
+	
+	@Reference
+	SlingRepository repository;
+
+	@Reference
+	PackageAdmin packageAdmin;
+	
+	@Reference
+	AuthenticationSupport auth;
 	
     /**
      * The <code>ClassLoader</code> to use when GWT reflects on RPC classes.
@@ -131,7 +147,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
      * This is public so that it can be unit tested easily without HTTP.
      * <p/>
      * In order to properly operate within Sling/OSGi, the classloader used by GWT has to be rerouted from
-     * <code>Thread.currentThread().getContextClassLoader()</code> to the classloader provided by the bundle.
+     * <code>Thread.currentThread().getContextClassLoader()</code> to the classloader provided by the Bundle.
      *
      * @param payload the UTF-8 request payload
      * @return a string which encodes either the method's return, a checked
@@ -151,6 +167,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
         if (classLoader != null) {
             final ClassLoader old = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(classLoader);
+            auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
 			callInit();
             result = super.processCall(payload);
             Thread.currentThread().setContextClassLoader(old);
@@ -170,7 +187,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
      * Override this method to provide a {@link com.google.gwt.user.server.rpc.SerializationPolicy} using an
      * alternative approach.
      * <p/>
-     * This method has been overriden, so that the serialization policy can be properly loaded as a bundle entry,
+     * This method has been overriden, so that the serialization policy can be properly loaded as a Bundle entry,
      * as Sling does not support <code>ServletContext.getResourceAsStream()</code>.
      *
      * @param request       the HTTP request being serviced
@@ -221,10 +238,10 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
             // Open the RPC resource file read its contents.
             InputStream is = null;
-            // if the bundle was set by the extending class, load the resource from it instead of the servlet context
-            if (bundle != null) {
+            // if the clientBundle was set by the extending class, load the resource from it instead of the servlet context
+            if (clientBundle != null) {
                 try {
-                    is = bundle.getResource(serializationPolicyFilePath).openStream();
+                    is = clientBundle.getResource(serializationPolicyFilePath).openStream();
                 } catch (IOException e) {
                     //ignore
                 } catch (NullPointerException e) {
@@ -281,14 +298,14 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     }
 
     /**
-     * Allows the extending OSGi service to set the bundle it is part of. The bundle is used to provide access
+     * Allows the extending OSGi service to set the clientBundle it is part of. The clientBundle is used to provide access
      * to the policy file otherwise loaded by <code>getServletContext().getResourceAsStream()</code> which is not
      * supported in Sling.
      *
-     * @param bundle The bundle to load the resource (policy file) from.
+     * @param clientBundle The clientBundle to load the resource (policy file) from.
      */
-    protected void setBundle(Bundle bundle) {
-        this.bundle = bundle;
+    protected void setClientBundle(Bundle bundle) {
+        this.clientBundle = bundle;
     }
 
     /**
@@ -312,6 +329,14 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 		return (String)this.getThreadLocalRequest().getAttribute("org.osgi.service.http.authentication.remote.user");
 	}
 	
+	public Bundle getBundleByName(String name) {
+		 Bundle[] ret = packageAdmin.getBundles(name, null);
+		 if (ret != null && ret.length > 0) {
+			 return ret[0];
+		 }
+		 return null;
+	}
+
 	protected Locale getLocale() {
 		if (getThreadLocalRequest().getAttribute("locale") == null) {
 			RequestWrapper rw = new RequestWrapper(getThreadLocalRequest(), config.getDefaultLocale());
@@ -409,5 +434,15 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 		ResourceBundle resourceBundle) {
 		getThreadLocalRequest().setAttribute("resourceBundle", resourceBundle);
 	
+	}
+
+	public SlingRepository getRepository() {
+		return repository;
+	}
+
+	public void setRepository(SlingRepository repository) {
+		this.repository = repository;
 	}		
+	
+	
 }
