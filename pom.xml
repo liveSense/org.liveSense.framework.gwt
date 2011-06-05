@@ -59,11 +59,26 @@
                             org.liveSense.servlet.gwtrpc.*;version=${project.version},
                             com.google.gwt.*;version=${gwt.version}
                         </Export-Package>
-                        <Import-Package>!com.google.gwt.*,!javax.imageio.*,!junit.*,!org.w3c.*,!sun.misc,!javax.validation.*,!org.json.*,*</Import-Package>
+                        <Import-Package>
+                        	!com.google.gwt.*,
+                        	!javax.imageio.*,
+                        	!junit.*,
+                        	!org.w3c.*,
+                        	!sun.misc,
+                        	!javax.validation.*,
+                        	!org.json.*,
+                        	!com.gargoylesoftware.*,
+                            !com.ibm.icu.*,
+                            !com.thoughtworks.selenium.*,
+                            !net.sourceforge.htmlunit.*,
+                            !org.apache.tapestry.*,
+                            !org.mortbay.jetty.*,
+                        	*
+                        </Import-Package>
                         <DynamicImport-Package>
                             javax.imageio.*
                         </DynamicImport-Package>
-                        <Embed-Dependency>gwt-servlet
+                        <Embed-Dependency>gwt-servlet, gwt-user
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
@@ -75,6 +90,10 @@
         <dependency>
              <groupId>com.google.gwt</groupId>
              <artifactId>gwt-servlet</artifactId>
+        </dependency>
+        <dependency>
+             <groupId>com.google.gwt</groupId>
+             <artifactId>gwt-user</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
