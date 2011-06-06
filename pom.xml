@@ -78,7 +78,9 @@
                         <DynamicImport-Package>
                             javax.imageio.*
                         </DynamicImport-Package>
-                        <Embed-Dependency>gwt-servlet, gwt-user
+                        <Embed-Dependency>
+                        	gwt-servlet;inline=/com/google/gwt, 
+                        	gwt-user;inline=/com/google/gwt
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
