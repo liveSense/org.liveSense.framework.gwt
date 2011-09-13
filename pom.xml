@@ -30,7 +30,6 @@
       <url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
   </scm>
  
-    <groupId>org.liveSense</groupId>
     <artifactId>org.liveSense.servlet.gwtrpc</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.1-SNAPSHOT</version>
