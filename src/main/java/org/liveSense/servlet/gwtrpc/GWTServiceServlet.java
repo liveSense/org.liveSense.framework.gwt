@@ -36,6 +36,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -53,6 +54,7 @@ import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
+import org.liveSense.core.BundleProxyClassLoader;
 import org.liveSense.core.Configurator;
 import org.liveSense.core.wrapper.I18nResourceWrapper;
 import org.liveSense.core.wrapper.RequestWrapper;
@@ -128,10 +130,28 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 	@Reference
 	AuthenticationSupport auth;
 	
+	public ClassLoader getClassLoaderByBundle(String name) throws ClassNotFoundException {
+		return new BundleProxyClassLoader(getBundleByName(name));
+	}
+
+	
+	private HashMap<String, ClassLoader> classLoaders = new HashMap<String, ClassLoader>();
+
+
+    /**
+     * Allows the extending OSGi service to set its classloader.
+     *
+     * @param classLoader The classloader to provide to the SlingRemoteServiceServlet.
+     */
+    protected void setClassLoader(ClassLoader classLoader) {
+        //this.classLoader = classLoader;
+    	classLoaders.put(classLoader.toString(), classLoader);
+    }
+
     /**
      * The <code>ClassLoader</code> to use when GWT reflects on RPC classes.
      */
-    private ClassLoader classLoader = null;
+    //private ClassLoader classLoader = null;
 
     /**
      * Process a call originating from the given request. Uses the
@@ -164,22 +184,35 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     @Override
     public String processCall(String payload) throws SerializationException {
         String result;
-        if (classLoader != null) {
+        if (!classLoaders.isEmpty()) {
             final ClassLoader old = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(classLoader);
+            // Generating composite classloader from map
+            
+            CompositeClassLoader cClassLoader = new CompositeClassLoader();
+            for (String key : classLoaders.keySet()) {
+                cClassLoader.add(classLoaders.get(key));            	
+            }
+            Thread.currentThread().setContextClassLoader(cClassLoader);
             auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
 			callInit();
             result = super.processCall(payload);
             Thread.currentThread().setContextClassLoader(old);
         } else {
         	callInit();
-            result = super.processCall(payload);
+        	try {
+        		result = super.processCall(payload);
+        	} finally {
+        		callFinal();
+        	}
         }
         return result;
     }
 
 	public abstract void callInit();
 
+	public abstract void callFinal();
+
+	
     /**
      * Gets the {@link com.google.gwt.user.server.rpc.SerializationPolicy} for given module base URL and strong
      * name if there is one.
@@ -307,15 +340,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     protected void setClientBundle(Bundle bundle) {
         this.clientBundle = bundle;
     }
-
-    /**
-     * Allows the extending OSGi service to set its classloader.
-     *
-     * @param classLoader The classloader to provide to the SlingRemoteServiceServlet.
-     */
-    protected void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
+    	
 
 	protected void setRootPath(String rootPath) {
 		this.rootPath = rootPath;
