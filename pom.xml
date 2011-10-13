@@ -56,7 +56,9 @@
                     <instructions>
                         <Export-Package>
                             org.liveSense.servlet.gwtrpc.*;version=${project.version},
-                            com.google.gwt.*;version=${gwt.version}
+                            com.google.gwt.*;version=${gwt.version},
+                            com.google.web.bindery.*;version=${gwt.version}
+                            
                         </Export-Package>
                         <Import-Package>
                         	!com.google.gwt.*,
