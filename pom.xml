@@ -30,11 +30,11 @@
       <url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
   </scm>
  
-    <artifactId>org.liveSense.servlet.gwtrpc</artifactId>
+    <artifactId>org.liveSense.framework.gwt</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-2.4.0-SNAPSHOT</version>
 
-    <name>liveSense GWT-RPC servlet</name>
+    <name>liveSense GWT framework</name>
     <description>
         GWT packages and RPC-Servlet
     </description>
