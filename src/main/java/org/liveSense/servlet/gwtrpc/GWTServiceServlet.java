@@ -21,6 +21,7 @@ package org.liveSense.servlet.gwtrpc;
  * @created Feb 12, 2010
  */
 import com.google.gwt.user.client.rpc.SerializationException;
+import com.google.gwt.user.server.rpc.RPC;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.gwt.user.server.rpc.SerializationPolicyLoader;
@@ -194,23 +195,39 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
             }
             Thread.currentThread().setContextClassLoader(cClassLoader);
             auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
-			callInit();
-            result = super.processCall(payload);
-            Thread.currentThread().setContextClassLoader(old);
+            try {
+            	callInit();
+            	result = super.processCall(payload);
+            } catch (Throwable e) {
+            	return RPC.encodeResponseForFailure(null, e);
+			} finally {
+				try {
+					callFinal();
+				} catch (Throwable e) {
+	            	return RPC.encodeResponseForFailure(null, e);					
+				}
+				Thread.currentThread().setContextClassLoader(old);
+			}
         } else {
-        	callInit();
-        	try {
-        		result = super.processCall(payload);
-        	} finally {
-        		callFinal();
-        	}
+            try {
+            	callInit();
+            	result = super.processCall(payload);
+            } catch (Throwable e) {
+            	return RPC.encodeResponseForFailure(null, e);
+			} finally {
+				try {
+					callFinal();
+				} catch (Throwable e) {
+	            	return RPC.encodeResponseForFailure(null, e);					
+				}
+			}
         }
         return result;
     }
 
-	public abstract void callInit();
+	public abstract void callInit() throws Throwable;
 
-	public abstract void callFinal();
+	public abstract void callFinal() throws Throwable;
 
 	
     /**
