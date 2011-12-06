@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.jcr.LoginException;
@@ -49,10 +50,14 @@ import javax.jcr.SimpleCredentials;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.auth.core.AuthenticationSupport;
 import org.apache.sling.auth.core.impl.SlingAuthenticator;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
 import org.apache.sling.jcr.api.SlingRepository;
+import org.apache.sling.jcr.resource.JcrResourceConstants;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
 import org.liveSense.core.BundleProxyClassLoader;
@@ -112,7 +117,10 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 	 * default log
 	 */
 	private final Logger log = LoggerFactory.getLogger(GWTServiceServlet.class);
-    /**
+
+	private final Logger payloadLogger = LoggerFactory.getLogger("GWTRPC");
+
+	/**
      * The <code>org.osgi.framework.Bundle</code> to load resources from.
      */
     private Bundle clientBundle;
@@ -131,6 +139,9 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 	@Reference
 	AuthenticationSupport auth;
 	
+	@Reference
+	ResourceResolverFactory resourceResolverFactory;
+	
 	public ClassLoader getClassLoaderByBundle(String name) throws ClassNotFoundException {
 		return new BundleProxyClassLoader(getBundleByName(name));
 	}
@@ -140,6 +151,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
 
     /**
+     *
      * Allows the extending OSGi service to set its classloader.
      *
      * @param classLoader The classloader to provide to the SlingRemoteServiceServlet.
@@ -154,6 +166,29 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
      */
     //private ClassLoader classLoader = null;
 
+    /**
+     * Exception handler. Doublle exception handling
+     * @param phase
+     * @param payload
+     * @param e
+     * @return
+     */
+    private String processException(String phase, String payload, Throwable e) {
+        String ret = "EX";
+        try {
+        	ret = RPC.encodeResponseForFailure(null, e);
+            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload, e);
+        } catch (Exception ex) {
+        	try {
+				ret = RPC.encodeResponseForFailure(null, new SerializationException("Serialization error", ex));
+			} catch (SerializationException e2) {
+			}
+            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload, ex);
+        }
+        payloadLogger.info("<<< ("+phase+") User: "+getUser()+" Reply: "+ret);
+        return ret;
+    }
+    
     /**
      * Process a call originating from the given request. Uses the
      * {@link com.google.gwt.user.server.rpc.RPC#invokeAndEncodeResponse(Object, java.lang.reflect.Method, Object[])}
@@ -185,44 +220,66 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     @Override
     public String processCall(String payload) throws SerializationException {
         String result;
+        
+        
+        ClassLoader oldClassLoader = null;
+        boolean osgiContext =false;
+
+        // Custom classloader - OSGi context
         if (!classLoaders.isEmpty()) {
-            final ClassLoader old = Thread.currentThread().getContextClassLoader();
+        	osgiContext = true;
+        }
+        	
+
+        if (osgiContext) {
+        	oldClassLoader = Thread.currentThread().getContextClassLoader();
+
             // Generating composite classloader from map
-            
             CompositeClassLoader cClassLoader = new CompositeClassLoader();
             for (String key : classLoaders.keySet()) {
                 cClassLoader.add(classLoaders.get(key));            	
             }
+            
+            // Set contextClassLoader
             Thread.currentThread().setContextClassLoader(cClassLoader);
-            auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
+        }    
+        try {
+            // Authenticating - OSGi context
+            if (osgiContext) {
+            	auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
+            }
+            
+            // CallInit
             try {
             	callInit();
-            	result = super.processCall(payload);
+                payloadLogger.info (">>> (callInit) User: "+getUser()+" Payload: "+payload);
             } catch (Throwable e) {
-            	return RPC.encodeResponseForFailure(null, e);
+            	return processException("callInit", payload, e);
+            }
+            
+            // ProcessCall
+            result = "";
+            try {
+            	result = super.processCall(payload);
+                payloadLogger.info(">>> (processCall) User: "+getUser()+" Payload: "+payload);
+            } catch (Throwable e) {
+                result = processException("processCall", payload, e);
 			} finally {
+				// callFinal
 				try {
 					callFinal();
 				} catch (Throwable e) {
-	            	return RPC.encodeResponseForFailure(null, e);					
-				}
-				Thread.currentThread().setContextClassLoader(old);
-			}
-        } else {
-            try {
-            	callInit();
-            	result = super.processCall(payload);
-            } catch (Throwable e) {
-            	return RPC.encodeResponseForFailure(null, e);
-			} finally {
-				try {
-					callFinal();
-				} catch (Throwable e) {
-	            	return RPC.encodeResponseForFailure(null, e);					
+					return processException("callFinal", payload, e);
+				} finally {
 				}
 			}
+            return result;						
+
+        } finally {
+            if (osgiContext) {
+            	Thread.currentThread().setContextClassLoader(oldClassLoader);
+            }
         }
-        return result;
     }
 
 	public abstract void callInit() throws Throwable;
@@ -288,6 +345,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
 
             // Open the RPC resource file read its contents.
             InputStream is = null;
+
             // if the clientBundle was set by the extending class, load the resource from it instead of the servlet context
             if (clientBundle != null) {
                 try {
@@ -297,7 +355,44 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
                 } catch (NullPointerException e) {
 					
 				}
-            } else {
+                // There is no client bundle defined, we try to load the configuration over SLING ResourceResolver
+                if (is == null) {
+                }
+                
+            // We are trying resource resolver in OSGi if clientBundle has not been set
+            } else if (resourceResolverFactory != null) {
+        		ResourceResolver resolver = null;
+        		Session session = null;
+
+            	try {
+            		session = repository.loginAdministrative(null);
+            		
+        			Map<String, Object> authInfo = new HashMap<String, Object>();
+        			authInfo.put(JcrResourceConstants  .AUTHENTICATION_INFO_SESSION,
+        					session);
+        			try {
+        				resolver = resourceResolverFactory
+        						.getResourceResolver(authInfo);
+        			} catch (org.apache.sling.api.resource.LoginException e) {
+        			}
+
+            		if (resolver != null) {
+                		Resource res = resolver.resolve(getThreadLocalRequest(), serializationPolicyFilePath);
+                		if (res != null) 
+                			is = res.adaptTo(InputStream.class);
+                		resolver.close();
+            		}
+            	} catch (Throwable e) {
+            		
+            	} finally {
+            		if (resolver != null && resolver.isLive()) {
+            			resolver.close();
+            		}
+            		if (session != null && session.isLive()) {
+            			session.logout();
+            		}
+            	}
+        	} else {
                 is = getServletContext().getResourceAsStream(
                         serializationPolicyFilePath);
             }
@@ -348,6 +443,9 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
     }
 
     /**
+     * @deprecated If the client bundle is not defined we use resourceResolver, so you use Sling-Bundle-Resources manifest tag.
+     * It is more flexible.
+     * 
      * Allows the extending OSGi service to set the clientBundle it is part of. The clientBundle is used to provide access
      * to the policy file otherwise loaded by <code>getServletContext().getResourceAsStream()</code> which is not
      * supported in Sling.
