@@ -177,15 +177,15 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
         String ret = "EX";
         try {
         	ret = RPC.encodeResponseForFailure(null, e);
-            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload, e);
+            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload+" Return: "+ret, e);
         } catch (Exception ex) {
         	try {
 				ret = RPC.encodeResponseForFailure(null, new SerializationException("Serialization error", ex));
 			} catch (SerializationException e2) {
 			}
-            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload, ex);
+            payloadLogger.error(">>> ("+phase+") User: "+getUser()+" Payload: "+payload+" Return: "+ret, ex);
         }
-        payloadLogger.info("<<< ("+phase+") User: "+getUser()+" Reply: "+ret);
+        payloadLogger.info("<<< ("+phase+") User: "+getUser()+" Return: "+ret);
         return ret;
     }
     
@@ -261,7 +261,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
             result = "";
             try {
             	result = super.processCall(payload);
-                payloadLogger.info(">>> (processCall) User: "+getUser()+" Payload: "+payload);
+                payloadLogger.info(">>> (processCall) User: "+getUser()+" Result: "+result);
             } catch (Throwable e) {
                 result = processException("processCall", payload, e);
 			} finally {
@@ -317,7 +317,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
                 modulePath = new URL(moduleBaseURL).getPath();
             } catch (MalformedURLException ex) {
                 // log the information, we will default
-                getServletContext().log("Malformed moduleBaseURL: " + moduleBaseURL, ex);
+                log.info("Malformed moduleBaseURL: " + moduleBaseURL, ex);
             }
         }
 
@@ -334,7 +334,7 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
                     + ", is not in the same web application as this servlet, "
                     + contextPath
                     + ".  Your module may not be properly configured or your client and server code maybe out of date.";
-            getServletContext().log(message);
+            log.info(message);
         } else {
             // Strip off the context path from the module base URL. It should be a
             // strict prefix.
@@ -406,27 +406,33 @@ public abstract class GWTServiceServlet extends RemoteServiceServlet {
                     	
                     	if (errorList != null && errorList.size()>0) {
                     		for (ClassNotFoundException e : errorList) {
-	                            getServletContext().log(
+	                            log.error(
 	                                    "ERROR: Could not find class '" + e.getMessage()
 	                                            + "' listed in the serialization policy file '"
 	                                            + serializationPolicyFilePath + "'"
-	                                            + "; your server's classpath may be misconfigured", e);
+	                                            + "; your server's classpath may be misconfigured - "+e.getMessage());
                     		}
                     	}
                     } catch (ParseException e) {
-                        getServletContext().log(
+                        log.error(
                                 "ERROR: Failed to parse the policy file '"
                                         + serializationPolicyFilePath + "'", e);
                     } catch (IOException e) {
-                        getServletContext().log(
+                        log.error(
                                 "ERROR: Could not read the policy file '"
                                         + serializationPolicyFilePath + "'", e);
-                    }
+                    } catch (Throwable e) {
+                    	if (e instanceof ClassNotFoundException) {
+                    		log.info("ERROR: GWT doGetSerializationPolicy: "+e.getMessage()+" Maybe the class is not available for this bundle? (Missing from dynamic import or Import in MANIFEST.MF or there is no bundle that exports)", e);
+                    	} else {
+                    		log.info("ERROR: GWT doGetSerializationPolicy: "+e.getMessage(), e);                    		
+                    	}
+					}
                 } else {
                     String message = "ERROR: The serialization policy file '"
                             + serializationPolicyFilePath
                             + "' was not found; did you forget to include it in this deployment?";
-                    getServletContext().log(message);
+                    log.error(message);
                 }
             } finally {
                 if (is != null) {
