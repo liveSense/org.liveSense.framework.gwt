@@ -56,33 +56,69 @@
                     <instructions>
                         <Export-Package>
                             org.liveSense.servlet.gwtrpc.*;version=${project.version},
-                            com.google.gwt.*;version=${gwt.version},
-                            com.google.web.bindery.*;version=${gwt.version}
-                            
+                            org.liveSense.servlet.requestfactory.*;version=${project.version},
+                            com.google.gwt.core.client.*;split-package:=merge-first;version=${gwt.version},
+                            com.google.web.bindery.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.activity.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.codegen.server.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.event.logical.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.event.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.i18n.server.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.i18n.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.logging.impl.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.logging.server.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.logging.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.place.impl.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.place.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.regexp.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.resources.css.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.resources.ext.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.resources.rg.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.rpc.server.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.safecss.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.safehtml.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.text.shared.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.user.server.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.util.regexfilter.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.i18n.client.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.resources.client.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.http.client.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.user.client.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.dev.util.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.dev.asm.*;split-package:=merge-first;version=${gwt.version},
+							com.google.gwt.editor.client.*;split-package:=merge-first;version=${gwt.version}
                         </Export-Package>
+                        
+                        <Private-Package>
+                        </Private-Package>
+                        
                         <Import-Package>
-                        	!com.google.gwt.*,
-                        	!javax.imageio.*,
-                        	!junit.*,
-                        	!org.w3c.*,
-                        	!sun.misc,
-                        	!javax.validation.*,
-                        	!org.json.*,
-                        	!com.gargoylesoftware.*,
-                            !com.ibm.icu.*,
-                            !com.thoughtworks.selenium.*,
-                            !net.sourceforge.htmlunit.*,
-                            !org.apache.tapestry.*,
-                            !org.mortbay.jetty.*,
-                        	*
+							!com.google.gwt.dev.resource.*,
+							!com.google.gwt.dom.client.*,
+							!com.google.gwt.i18n.rebind.keygen.*,
+							!com.google.gwt.logging.client.*,
+							!com.google.gwt.resources.client.*,
+							!com.google.gwt.rpc.client.ast.*,
+							!com.google.gwt.rpc.client.impl.*,
+							!com.google.gwt.thirdparty.guava.common.base.*,
+							!com.google.gwt.user.rebind.*,
+							!com.google.gwt.util.tools.*,
+							!com.google.gwt.view.client.*,
+							!com.google.gwt.xhr.client.*,
+							!com.google.gwt.core.ext.*,
+							!com.google.gwt.event.dom.client.*,
+							!com.google.gwt.thirdparty.streamhtmlparser.*,
+							!org.w3c.css.sac.*,
+							!org.w3c.flute.parser.*,
+							!com.google.gwt.jsonp.client.*,
+							!com.google.gwt.lang.*
+							*
                         </Import-Package>
+                        <!-- We allow to import every package, beacuse the RequestFactoryServlet's classloader have to load -->
                         <DynamicImport-Package>
-                            javax.imageio.*
+                        	*
                         </DynamicImport-Package>
-                        <Embed-Dependency>
-                        	gwt-servlet;inline=/com/google/gwt, 
-                        	gwt-user;inline=/com/google/gwt
-                        </Embed-Dependency>
+                        <Embed-Dependency>json;inline=true</Embed-Dependency>
                     </instructions>
                 </configuration>
 
@@ -90,14 +126,25 @@
         </plugins>
     </build>
     <dependencies>
+    	<dependency>
+    		 <groupId>org.json</groupId>
+    		 <artifactId>json</artifactId>
+    		 <version>20090211</version>
+		</dependency>
+    	<dependency>
+    		 <groupId>org.liveSense</groupId>
+    		 <artifactId>org.liveSense.misc.jsr303</artifactId>
+		</dependency>
         <dependency>
              <groupId>com.google.gwt</groupId>
              <artifactId>gwt-servlet</artifactId>
         </dependency>
+        <!-- 
         <dependency>
              <groupId>com.google.gwt</groupId>
              <artifactId>gwt-user</artifactId>
         </dependency>
+         -->
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
