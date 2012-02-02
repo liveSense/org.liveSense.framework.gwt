@@ -249,7 +249,7 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 
 	public abstract void callFinal() throws Throwable;
 	
-	public abstract ServerFailure faliure(Throwable throwable);
+	public abstract ServerFailure failure(Throwable throwable);
 	
 	static final MessageFactory FACTORY = AutoBeanFactorySource.create(MessageFactory.class);
     

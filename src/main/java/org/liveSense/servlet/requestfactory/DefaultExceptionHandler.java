@@ -17,7 +17,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 		log.error("Faliure: ", throwable);
 		ServerFailure failure = null;
 		try {
-			failure = this.requestFactoryServlet.faliure(throwable);
+			failure = this.requestFactoryServlet.failure(throwable);
 		} catch (Throwable e) {
 		}
 		if (failure == null) failure = new ServerFailure( throwable.getMessage(), throwable.getClass().getName(), null, true );
