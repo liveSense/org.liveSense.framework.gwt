@@ -402,7 +402,7 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 			perThreadContext.set(null);
 			perThreadRequest.set(null);
 			perThreadResponse.set(null);
-
+			response.setCharacterEncoding(config.getEncoding());
         	PrintWriter writer = response.getWriter();
 			writer.print(payload);
 			writer.flush();
