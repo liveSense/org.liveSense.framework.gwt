@@ -120,7 +120,7 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 	PackageAdmin packageAdmin;
 	
 	@Reference
-	AuthenticationSupport auth;
+	AuthenticationSupport authenticationSupport;
 	
 	@Reference
 	ResourceResolverFactory resourceResolverFactory;
@@ -186,37 +186,7 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 	 * {@code DefaultExceptionHandler}.
 	 */
 	public GWTRequestFactoryServlet() {
-//		this(defaultExceptionHandler);
-//		defaultExceptionHandler.setRequestFactoryServlet(this);
 	}
-
-	/**
-	 * Use this constructor in subclasses to provide a custom
-	 * {@link ExceptionHandler}.
-	 * 
-	 * @param exceptionHandler an {@link ExceptionHandler} instance
-	 * @param serviceDecorators an array of ServiceLayerDecorators that change how
-	 *          the RequestFactory request processor interact with the domain
-	 *          objects
-	 */
-	/*
-	public GWTRequestFactoryServlet(ExceptionHandler exceptionHandler, ServiceLayerDecorator... serviceDecorators) {
-		ClassLoader old = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-		List<ServiceLayerDecorator> decorators = new ArrayList<ServiceLayerDecorator>(); //.asList(serviceDecorators);
-		decorators.add(new OsgiServiceLayerDecorator(GWTRequestFactoryServlet.class.getClassLoader()));		
-		for (ServiceLayerDecorator dec : serviceDecorators) decorators.add(dec);
-		ServiceLayerDecorator[] newDecorators = new ServiceLayerDecorator[decorators.size()];
-		newDecorators = decorators.toArray(newDecorators);
-		log.info("Generating GWTRequestFactory servlet with the following decorators: ");
-		for (int i = 0; i < newDecorators.length; i++) {
-			log.info("    - "+newDecorators[i].getClass().getName()+" ");
-		}
-		processor = new SimpleRequestProcessor(ServiceLayer.create(newDecorators));
-		processor.setExceptionHandler(exceptionHandler);
-		Thread.currentThread().setContextClassLoader(old);
-	}
-	*/
 	
 	private void ensureConfig() {
 		String symbolMapsDirectory = getServletConfig().getInitParameter("symbolMapsDirectory");
@@ -224,11 +194,6 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 			Logging.setSymbolMapsDirectory(symbolMapsDirectory);
 		}
 	}
-	/*
-	public ClassLoader getClassLoaderByBundle(String name) throws ClassNotFoundException {
-		return new BundleProxyClassLoader(getBundleByName(name));
-	}
-	*/
 	
 	private HashMap<String, ClassLoader> classLoaders = new HashMap<String, ClassLoader>();
 
@@ -343,9 +308,9 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 
         	
         	// Authenticating - OSGi context
-            if (auth != null && !error) {
+            if (authenticationSupport != null && !error) {
 	            try {
-	            	auth.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
+	            	authenticationSupport.handleSecurity(getThreadLocalRequest(), getThreadLocalResponse());
 	            } catch (Throwable e) {
 	            	error = true;
 	            	payload = processException("handleSecurity", jsonRequestString, e);
@@ -471,7 +436,39 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 
 	public void setRepository(SlingRepository repository) {
 		this.repository = repository;
+	}
+
+	public Configurator getConfig() {
+		return config;
+	}
+
+	public void setConfig(Configurator config) {
+		this.config = config;
+	}
+
+	public PackageAdmin getPackageAdmin() {
+		return packageAdmin;
+	}
+
+	public void setPackageAdmin(PackageAdmin packageAdmin) {
+		this.packageAdmin = packageAdmin;
+	}
+
+	public ResourceResolverFactory getResourceResolverFactory() {
+		return resourceResolverFactory;
+	}
+
+	public void setResourceResolverFactory(
+			ResourceResolverFactory resourceResolverFactory) {
+		this.resourceResolverFactory = resourceResolverFactory;
+	}
+
+	public AuthenticationSupport getAuthenticationSupport() {
+		return authenticationSupport;
+	}
+
+	public void setAuthenticationSupport(AuthenticationSupport authenticationSupport) {
+		this.authenticationSupport = authenticationSupport;
 	}		
-	
 	
 }
