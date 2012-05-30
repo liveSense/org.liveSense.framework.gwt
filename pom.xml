@@ -34,7 +34,7 @@
     <packaging>bundle</packaging>
     <version>1.0.1-2.4.0-SNAPSHOT</version>
 
-    <name>liveSense GWT framework</name>
+    <name>liveSense :: Framework :: GWT framework</name>
     <description>
         GWT packages and RPC-Servlet
     </description>
