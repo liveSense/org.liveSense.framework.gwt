@@ -20,33 +20,10 @@ package org.liveSense.servlet.requestfactory;
  * @author Robert Csakany (robson@semmi.se)
  * @created Jan 04, 2011
  */
-import com.google.gwt.user.server.rpc.RPCServletUtils;
-import com.google.web.bindery.autobean.shared.AutoBean;
-import com.google.web.bindery.autobean.shared.AutoBeanCodex;
-import com.google.web.bindery.autobean.vm.AutoBeanFactorySource;
-import com.google.web.bindery.requestfactory.server.ExceptionHandler;
-import com.google.web.bindery.requestfactory.server.Logging;
-import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
-import com.google.web.bindery.requestfactory.server.ServiceLayer;
-import com.google.web.bindery.requestfactory.server.ServiceLayerDecorator;
-import com.google.web.bindery.requestfactory.server.SimpleRequestProcessor;
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
-import com.google.web.bindery.requestfactory.shared.messages.MessageFactory;
-import com.google.web.bindery.requestfactory.shared.messages.ResponseMessage;
-import com.google.web.bindery.requestfactory.shared.messages.ServerFailureMessage;
-
-import org.osgi.framework.Bundle;
-import org.osgi.service.packageadmin.PackageAdmin;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -66,15 +43,31 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.auth.core.AuthenticationSupport;
 import org.apache.sling.auth.core.spi.AuthenticationInfo;
+import org.apache.sling.commons.classloader.DynamicClassLoaderManager;
 import org.apache.sling.jcr.api.SlingRepository;
+import org.liveSense.core.Configurator;
+import org.liveSense.core.wrapper.RequestWrapper;
 import org.liveSense.servlet.gwtrpc.CompositeClassLoader;
 import org.liveSense.servlet.gwtrpc.exceptions.AccessDeniedException;
 import org.liveSense.servlet.gwtrpc.exceptions.InternalException;
-import org.liveSense.core.BundleProxyClassLoader;
-import org.liveSense.core.Configurator;
-import org.liveSense.core.wrapper.RequestWrapper;
+import org.osgi.framework.Bundle;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gwt.user.server.rpc.RPCServletUtils;
+import com.google.web.bindery.autobean.shared.AutoBean;
+import com.google.web.bindery.autobean.shared.AutoBeanCodex;
+import com.google.web.bindery.autobean.vm.AutoBeanFactorySource;
+import com.google.web.bindery.requestfactory.server.Logging;
+import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
+import com.google.web.bindery.requestfactory.server.ServiceLayer;
+import com.google.web.bindery.requestfactory.server.SimpleRequestProcessor;
+import com.google.web.bindery.requestfactory.shared.RequestFactory;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.google.web.bindery.requestfactory.shared.messages.MessageFactory;
+import com.google.web.bindery.requestfactory.shared.messages.ResponseMessage;
+import com.google.web.bindery.requestfactory.shared.messages.ServerFailureMessage;
 
 /**
  * Extending google's request factory servlet
@@ -124,6 +117,11 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 	
 	@Reference
 	ResourceResolverFactory resourceResolverFactory;
+	
+	@Reference
+	protected DynamicClassLoaderManager dynamicClassLoaderManager;
+
+
 	
 	private static final String JSON_CHARSET = "UTF-8";
 	private static final String JSON_CONTENT_TYPE = "application/json";
@@ -186,8 +184,21 @@ public abstract class GWTRequestFactoryServlet extends HttpServlet {
 	 * {@code DefaultExceptionHandler}.
 	 */
 	public GWTRequestFactoryServlet() {
+
 	}
 	
+	protected void initOsgiProcessor() {
+		// Set google serviceLayerCache off
+		System.setProperty("gwt.rf.ServiceLayerCache", new Boolean(false).toString());
+		
+		getDefaultExceptionHandler().setRequestFactoryServlet(this);
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+		processor = new SimpleRequestProcessor(ServiceLayer.create(new OsgiServiceLayerDecorator(dynamicClassLoaderManager.getDynamicClassLoader())));
+		processor.setExceptionHandler(getDefaultExceptionHandler());
+		Thread.currentThread().setContextClassLoader(old);
+	}
+
 	private void ensureConfig() {
 		String symbolMapsDirectory = getServletConfig().getInitParameter("symbolMapsDirectory");
 		if (symbolMapsDirectory != null) {

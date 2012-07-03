@@ -18,47 +18,47 @@
  */
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-  <parent>
-      <groupId>org.liveSense</groupId>
-      <artifactId>org.liveSense.parent</artifactId>
-      <version>1-SNAPSHOT</version>
-  </parent>
-  <scm>
-      <connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
-      <developerConnection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</developerConnection>
-      <url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
-  </scm>
- 
-    <artifactId>org.liveSense.framework.gwt</artifactId>
-    <packaging>bundle</packaging>
-    <version>${gwt.version}_1-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.liveSense</groupId>
+		<artifactId>org.liveSense.parent</artifactId>
+		<version>1-SNAPSHOT</version>
+	</parent>
+	<scm>
+		<connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
+		<developerConnection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</developerConnection>
+		<url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
+	</scm>
 
-    <name>liveSense :: Framework :: GWT framework</name>
-    <description>
+	<artifactId>org.liveSense.framework.gwt</artifactId>
+	<packaging>bundle</packaging>
+	<version>${gwt.version}_1-SNAPSHOT</version>
+
+	<name>liveSense :: Framework :: GWT framework</name>
+	<description>
         GWT packages and RPC-Servlet
     </description>
 
-    <build>
-        <plugins>
-   
-               <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-scr-plugin</artifactId>
-                </plugin>
+	<build>
+		<plugins>
 
-         <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+			</plugin>
 
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.liveSense.servlet.gwtrpc.*;version=${project.version},
-                            org.liveSense.servlet.requestfactory.*;version=${project.version},
-                            com.google.gwt.core.client.*;split-package:=merge-first;version=${gwt.version},
-                            com.google.web.bindery.*;split-package:=merge-first;version=${gwt.version},
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+
+				<configuration>
+					<instructions>
+						<Export-Package>
+							org.liveSense.servlet.gwtrpc.*;version=${project.version},
+							org.liveSense.servlet.requestfactory.*;version=${project.version},
+							com.google.gwt.core.client.*;split-package:=merge-first;version=${gwt.version},
+							com.google.web.bindery.*;split-package:=merge-first;version=${gwt.version},
 							com.google.gwt.activity.shared.*;split-package:=merge-first;version=${gwt.version},
 							com.google.gwt.codegen.server.*;split-package:=merge-first;version=${gwt.version},
 							com.google.gwt.event.logical.shared.*;split-package:=merge-first;version=${gwt.version},
@@ -87,12 +87,12 @@
 							com.google.gwt.dev.util.*;split-package:=merge-first;version=${gwt.version},
 							com.google.gwt.dev.asm.*;split-package:=merge-first;version=${gwt.version},
 							com.google.gwt.editor.client.*;split-package:=merge-first;version=${gwt.version}
-                        </Export-Package>
-                        
-                        <Private-Package>
-                        </Private-Package>
-                        
-                        <Import-Package>
+						</Export-Package>
+
+						<Private-Package>
+						</Private-Package>
+
+						<Import-Package>
 							!com.google.gwt.dev.resource.*,
 							!com.google.gwt.dom.client.*,
 							!com.google.gwt.i18n.rebind.keygen.*,
@@ -113,83 +113,75 @@
 							!com.google.gwt.jsonp.client.*,
 							!com.google.gwt.lang.*
 							*
-                        </Import-Package>
-                        <!-- We allow to import every package, beacuse the RequestFactoryServlet's classloader have to load -->
-                        <DynamicImport-Package>
-                        	*
-                        </DynamicImport-Package>
-                        <Embed-Dependency>json;inline=true</Embed-Dependency>
-                    </instructions>
-                </configuration>
+						</Import-Package>
+						<!-- We allow to import every package, beacuse the RequestFactoryServlet's classloader have to load -->
+						<DynamicImport-Package>
+							*
+						</DynamicImport-Package>
+						<Embed-Dependency>json;inline=true</Embed-Dependency>
+					</instructions>
+				</configuration>
 
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-    	<dependency>
-    		 <groupId>org.json</groupId>
-    		 <artifactId>json</artifactId>
-    		 <version>20090211</version>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20090211</version>
 		</dependency>
-    	<dependency>
-    		 <groupId>org.liveSense</groupId>
-    		 <artifactId>org.liveSense.misc.jsr303</artifactId>
+		<dependency>
+			<groupId>org.liveSense</groupId>
+			<artifactId>org.liveSense.misc.jsr303</artifactId>
 		</dependency>
-        <dependency>
-             <groupId>com.google.gwt</groupId>
-             <artifactId>gwt-servlet</artifactId>
-        </dependency>
-        <!-- 
-        <dependency>
-             <groupId>com.google.gwt</groupId>
-             <artifactId>gwt-user</artifactId>
-        </dependency>
-         -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liveSense</groupId>
-            <artifactId>org.liveSense.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.jcr</groupId>
-            <artifactId>jcr</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.jcr.api</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.jcr.resource</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.api</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+		</dependency>
+		<!-- <dependency> <groupId>com.google.gwt</groupId> <artifactId>gwt-user</artifactId> </dependency> -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liveSense</groupId>
+			<artifactId>org.liveSense.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.jcr</groupId>
+			<artifactId>jcr</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.jcr.api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.jcr.resource</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.commons.classloader</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.sling</groupId>
+			<artifactId>org.apache.sling.auth.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.scr.annotations</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.auth.core</artifactId>
-        </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.engine</artifactId>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr.annotations</artifactId>
-        </dependency>
-
-    </dependencies>
+	</dependencies>
 </project>
 
 

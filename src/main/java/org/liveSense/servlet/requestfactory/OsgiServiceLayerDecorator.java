@@ -42,7 +42,7 @@ public class OsgiServiceLayerDecorator extends ServiceLayerDecorator {
 	      //return report(e);
 	    	ex = e.getTargetException();
 	    }
-	    return die(ex, "Could not invoke method %s", domainMethod.getName());
+	    return die(ex, "Could not invoke method %s", args[0].getClass().getName()+"."+domainMethod.getName());
 	  }
 
 	
