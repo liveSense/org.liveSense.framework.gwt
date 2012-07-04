@@ -7,6 +7,7 @@ import org.apache.sling.commons.classloader.DynamicClassLoaderManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +44,26 @@ public class OsgiServiceLocator implements ServiceLocator {
 				if (clazz != null) {
 					Bundle bundle = FrameworkUtil.getBundle(clazz);
 					if (bundle != null) {
-						serviceCache.put(className, bundle.getBundleContext().getService(bundle.getBundleContext().getServiceReference(className)));
+						try {
+							ServiceReference ref = bundle.getBundleContext().getServiceReference(clazz.getName());
+							if (ref != null) {
+								serviceCache.put(className, bundle.getBundleContext().getService(ref));
+							} else {
+								log.info("OSGi reference does not found, creating class: "+clazz.getName());
+								// We try to create. We don't cache
+								try {
+									return clazz.newInstance();
+								} catch (InstantiationException e) {
+									throw new RuntimeException(e);
+								} catch (IllegalAccessException e) {
+									throw new RuntimeException(e);
+								}
+							}
+						} catch (Throwable th) {
+							log.error("Could not get service reference for clazz: "+clazz.getName(), th);
+						}
 					}
+
 				}
 			}
 			return serviceCache.get(className);
@@ -58,15 +77,15 @@ public class OsgiServiceLocator implements ServiceLocator {
 		}
 		return null;
 	}
-	
+
 	public static void removeFromCache(Class<?> clazz) {
 		serviceCache.remove(clazz);
 	}
-	
+
 	public static void addToCache(Class<?> clazz, Object obj) {
 		serviceCache.put(clazz.getName(), obj);
 	}
-	
+
 	public static Object getFromCache(Class<?> clazz) {
 		return serviceCache.get(clazz.getName());
 	}
