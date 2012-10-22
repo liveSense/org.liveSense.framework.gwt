@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-/*
- *  Copyright 2010 Robert Csakany <robson@semmi.se>.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
+	/*
+	* Copyright 2010 Robert Csakany <robson@semmi.se>.
+	*
+	* Licensed under the Apache License, Version 2.0 (the "License");
+	* you may not use this file except in compliance with the License.
+	* You may obtain a copy of the License at
+	*
+	* http://www.apache.org/licenses/LICENSE-2.0
+	*
+	* Unless required by applicable law or agreed to in writing, software
+	* distributed under the License is distributed on an "AS IS" BASIS,
+	* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	* See the License for the specific language governing permissions and
+	* limitations under the License.
+	* under the License.
+	*/
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.livesense</groupId>
 		<artifactId>org.liveSense.parent</artifactId>
-		<version>1-SNAPSHOT</version>
+		<version>2-SNAPSHOT</version>
+		<relativePath>../org.liveSense.parent</relativePath>
 	</parent>
 	<scm>
 		<connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
@@ -41,12 +42,6 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-scr-plugin</artifactId>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -54,71 +49,34 @@
 
 				<configuration>
 					<instructions>
-						<Export-Package>
-							org.liveSense.servlet.gwtrpc.*;version=${project.version},
-							org.liveSense.servlet.requestfactory.*;version=${project.version},
-							com.google.gwt.core.client.*;split-package:=merge-first;version=${gwt.version},
-							com.google.web.bindery.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.activity.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.codegen.server.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.event.logical.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.event.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.i18n.server.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.i18n.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.logging.impl.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.logging.server.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.logging.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.place.impl.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.place.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.regexp.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.resources.css.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.resources.ext.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.resources.rg.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.rpc.server.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.safecss.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.safehtml.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.text.shared.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.user.server.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.util.regexfilter.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.i18n.client.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.resources.client.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.http.client.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.user.client.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.dev.util.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.dev.asm.*;split-package:=merge-first;version=${gwt.version},
-							com.google.gwt.editor.client.*;split-package:=merge-first;version=${gwt.version}
-						</Export-Package>
-
-						<Private-Package>
-						</Private-Package>
-
 						<Import-Package>
-							!com.google.gwt.dev.resource.*,
-							!com.google.gwt.dom.client.*,
-							!com.google.gwt.i18n.rebind.keygen.*,
-							!com.google.gwt.logging.client.*,
-							!com.google.gwt.resources.client.*,
-							!com.google.gwt.rpc.client.ast.*,
-							!com.google.gwt.rpc.client.impl.*,
-							!com.google.gwt.thirdparty.guava.common.base.*,
-							!com.google.gwt.user.rebind.*,
-							!com.google.gwt.util.tools.*,
-							!com.google.gwt.view.client.*,
-							!com.google.gwt.xhr.client.*,
-							!com.google.gwt.core.ext.*,
-							!com.google.gwt.event.dom.client.*,
-							!com.google.gwt.thirdparty.streamhtmlparser.*,
-							!org.w3c.css.sac.*,
-							!org.w3c.flute.parser.*,
-							!com.google.gwt.jsonp.client.*,
-							!com.google.gwt.lang.*
-							*
+							com.google.gwt.core.ext.*;resolution:=optional,
+							com.google.gwt.core.linker.*;resolution:=optional,
+							com.google.gwt.dev.cfg.*;resolution:=optional,
+							com.google.gwt.dev.jjs.*;resolution:=optional,
+							com.google.gwt.dev.resource.*;resolution:=optional,
+							com.google.gwt.dev.util.collect.*;resolution:=optional,
+							com.google.gwt.dev.util.log.*;resolution:=optional,
+							com.google.gwt.i18n.rebind.keygen.*;resolution:=optional,
+							com.google.gwt.json.client.*;resolution:=optional,
+							com.google.gwt.lang.*;resolution:=optional,
+							com.google.gwt.thirdparty.guava.common.base.*;resolution:=optional,
+							com.google.gwt.thirdparty.streamhtmlparser.*;resolution:=optional,
+							com.google.gwt.uibinder.rebind.*;resolution:=optional,
+							com.google.gwt.user.rebind.*;resolution:=optional,
+							junit.framework.*;resolution:=optional,
+							org.w3c.css.sac.*;resolution:=optional,
+							org.w3c.flute.parser.*;resolution:=optional
+							
 						</Import-Package>
-						<!-- We allow to import every package, beacuse the RequestFactoryServlet's classloader have to load -->
-						<DynamicImport-Package>
-							*
-						</DynamicImport-Package>
-						<Embed-Dependency>json;inline=true</Embed-Dependency>
+						<_exportcontents>
+							com.google.gwt.*;version=${project.version},
+							com.google.web.bindery.*;version=${project.version},
+						</_exportcontents>
+						<!-- There are config files with same name will be overwritten -->
+						<Embed-Dependency>*;scope=compile;inline=true</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
 
@@ -132,54 +90,13 @@
 			<version>20090211</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.livesense</groupId>
-			<artifactId>org.liveSense.misc.jsr303</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>com.google.gwt</groupId> <artifactId>gwt-user</artifactId> </dependency> -->
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.livesense</groupId>
-			<artifactId>org.liveSense.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.jcr</groupId>
-			<artifactId>jcr</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.jcr.api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.jcr.resource</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.commons.classloader</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.sling</groupId>
-			<artifactId>org.apache.sling.auth.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr.annotations</artifactId>
-		</dependency>
+		<!-- <dependency>
+			 <groupId>com.google.gwt</groupId>
+			 <artifactId>gwt-user</artifactId>
+		</dependency> -->
 
 	</dependencies>
 </project>
