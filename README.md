@@ -1,7 +1,9 @@
 # [liveSense :: Framework :: GWT framework - org.liveSense.framework.gwt](http://github.com/liveSense/org.liveSense.framework.gwt)
+
 ## Description
 GWT packages and RPC-Servlet
-## Exported packages
+
+## OSGi Exported packages
 * com.google.gwt.activity.shared(2.4.0.SNAPSHOT)
 * com.google.gwt.animation.client(2.4.0.SNAPSHOT)
 * com.google.gwt.animation.client.testing(2.4.0.SNAPSHOT)
@@ -137,7 +139,14 @@ GWT packages and RPC-Servlet
 * com.google.web.bindery.requestfactory.vm(2.4.0.SNAPSHOT)
 * com.google.web.bindery.requestfactory.vm.impl(2.4.0.SNAPSHOT)
 * com.google.web.bindery.requestfactory.vm.testing(2.4.0.SNAPSHOT)
-## Dependencies
+
+## OSGi Dependencies
 * __Apache Felix Http Jetty - org.apache.felix.http.jetty (2.2.0)__
 	* javax.servlet.http
-## Embedded JARs
+* __[liveSense :: Misc :: JSR 303 Bean Validation - org.liveSense.misc.jsr303 (2-SNAPSHOT)](http://github.com/liveSense/org.liveSense.misc.jsr303)__
+	* javax.validation
+
+## OSGi Embedded JARs
+
+## Dependency Graph
+![alt text](http://raw.github.com.everydayimmirror.in/liveSense/org.liveSense.framework.gwt/master/osgidependencies.svg "")
