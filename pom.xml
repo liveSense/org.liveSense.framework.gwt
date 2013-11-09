@@ -23,7 +23,7 @@
 		<groupId>com.github.livesense</groupId>
 		<artifactId>org.liveSense.parent</artifactId>
 		<version>2-SNAPSHOT</version>
-		<relativePath>../org.liveSense.parent</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 	<scm>
 		<connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
@@ -33,7 +33,7 @@
 
 	<artifactId>org.liveSense.framework.gwt</artifactId>
 	<packaging>bundle</packaging>
-	<version>${gwt.version}_1-SNAPSHOT</version>
+	<version>2.5.0_1-SNAPSHOT</version>
 
 	<name>liveSense :: Framework :: GWT framework</name>
 	<description>

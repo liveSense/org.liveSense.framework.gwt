@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><features name="liveSense-${liveSense.version}-framework-gwt" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+	<feature name="liveSense-framework-gwt" version="${liveSense.framework.gwt.version}" description="liveSense Framework GWT">
+        <feature>liveSense-core-beanvalidation</feature>
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.0.0/2.2.0</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.java-persistence-api-1.1.1/2.2.0</bundle>
+		<bundle>mvn:com.github.livesense/org.liveSense.framework.gwt/${liveSense.framework.gwt.version}</bundle>
+ 	</feature>
+</features>
