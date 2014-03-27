@@ -26,9 +26,9 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<scm>
-		<connection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</connection>
-		<developerConnection>scm:git:git://github.com/liveSense/org.liveSense.servlet.gwtrpc.git</developerConnection>
-		<url>https://github.com/liveSense/org.liveSense.servlet.gwtrpc</url>
+		<connection>scm:git:https://github.com/liveSense/org.liveSense.framework.gwt.git</connection>
+		<developerConnection>scm:git:https://github.com/liveSense/org.liveSense.framework.gwt.git</developerConnection>
+		<url>https://github.com/liveSense/org.liveSense.framework.gwt</url>
 	</scm>
 
 	<artifactId>org.liveSense.framework.gwt</artifactId>
