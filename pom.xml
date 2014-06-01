@@ -67,11 +67,10 @@
 							junit.framework.*;resolution:=optional,
 							org.w3c.css.sac.*;resolution:=optional,
 							org.w3c.flute.parser.*;resolution:=optional
-							
 						</Import-Package>
 						<_exportcontents>
 							com.google.gwt.*;version=${gwt.version},
-							com.google.web.bindery.*;version=${gwt.version},
+							com.google.web.bindery.*;version=${gwt.version}
 						</_exportcontents>
 						<!-- There are config files with same name will be overwritten -->
 						<Embed-Dependency>*;scope=compile;inline=true</Embed-Dependency>
@@ -85,19 +84,10 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20090211</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
+            <scope>compile</scope>
 		</dependency>
-		<!-- <dependency>
-			 <groupId>com.google.gwt</groupId>
-			 <artifactId>gwt-user</artifactId>
-		</dependency> -->
-
 	</dependencies>
 </project>
 
